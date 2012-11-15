@@ -3,9 +3,7 @@ my$
 
 A basic css selector engine
 
-To get started, add selector_engine.js to your html file:
-
-&ltscript type="text/javascript" src="selector_engine.js"&gt&lt/script&gt
+To get started, add selector_engine.js to your html file
 
 
 Eg: my$("div, p, a")  
