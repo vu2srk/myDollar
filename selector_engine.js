@@ -1,20 +1,24 @@
-var SelectedNodes = function(selectors, nodes){
-    this.nodes = [];
-    this.selectedNodes = [];
-    if (typeof(nodes)==="undefined" || nodes.length==0)
-        var nodes = document.getElementsByTagName("*");
-    for(var i = nodes.length; i--; this.nodes.unshift(nodes[i]));
-    var allNodes = this.nodes;
-    if (typeof(selectors)==="undefined"||selectors.trim()=="")
+var SelectedNodes = function(selectors){
+    
+    if (typeof selectors === "undefined" || selectors.trim() == "")
         return;
+     
+    //my$(".something div")
+
+    var slice = Array.prototype.slice;
+
+    this.selectedNodes = [];
+    this.nodes = slice.call(document.getElementsByTagName("*"), 0);
+    var allNodes = this.nodes;
     var selectedNodes = [];
-    regex = /^(?:#([\w\-]+)|(\w+)|\.([\w\-]+))$/;
-    selectorArray = selectors.split(",");
+    var regex = /^(?:#([\w\-]+)|(\w+)|\.([\w\-]+))$/;
+
+    var selectorArray = selectors.split(",");
     for (var i=0;i<selectorArray.length;i++){
         var selector = selectorArray[i];
         var subSelectors = selector.split(/(?=[ #.])/);
-        for (j=0;j<subSelectors.length;j++){
-            match = regex.exec(subSelectors[j].trim());
+        for (var j=0;j<subSelectors.length;j++){
+            var match = regex.exec(subSelectors[j].trim());
             if (match[0]){
                 if (match[1]){
                     this.nodes = this.hasID(match[1]);
@@ -25,11 +29,12 @@ var SelectedNodes = function(selectors, nodes){
                 }
             }
             if (j+1 != subSelectors.length){
+                var newNodes = [];
                 for (var d=0;d<this.nodes.length;d++){
                     var node = this.nodes[d];
-                    var newNodes = this.nodes[d].getElementsByTagName("*");
+                    newNodes = newNodes.concat(slice.call(node.getElementsByTagName("*"),0));
                 }
-                for(var x = newNodes.length; x--; this.nodes.unshift(newNodes[x]));
+                this.nodes = newNodes;
             }
         }
         this.selectedNodes = this.selectedNodes.concat(this.nodes);
@@ -44,9 +49,9 @@ SelectedNodes.prototype = {
 
     hasTag : function(tagName){
         var newList = [];
-        if(typeof(tagName)==='undefined')
+        if (typeof tagName==='undefined')
             this.throwError("No tag name specified");
-        else{
+        else {
             var len = this.nodes.length;
             for (var i=0;i<len;i++){
                 if (this.nodes[i].tagName == tagName.toUpperCase())
@@ -58,7 +63,7 @@ SelectedNodes.prototype = {
 
     hasClass : function(className){
         var newList = [];
-        if(typeof(className)==='undefined')
+        if(typeof className === 'undefined')
             this.throwError("No class name specified");
         else{
             var len = this.nodes.length;
@@ -72,7 +77,7 @@ SelectedNodes.prototype = {
 
     hasID : function(id){
         var newList = [];
-        if(typeof(id)==='undefined')
+        if(typeof id ==='undefined')
             this.throwError("No id specified");
         else{
             var len = this.nodes.length;
@@ -91,7 +96,7 @@ SelectedNodes.prototype = {
     },
 
     html : function(htmlContent){
-        if (typeof(htmlContent)==="undefined" || htmlContent.trim()=="")
+        if (typeof htmlContent === "undefined" || htmlContent.trim()=="")
             return this.selectedNodes[0].innerHTML;
         else{
             for (var i=0;i<this.selectedNodes.length;i++){
