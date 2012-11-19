@@ -1,3 +1,22 @@
+
+function contains(list, item){
+    for (var i=0;i<list.length;i++){
+        if (item === list[i])
+            return true;
+    }
+    return false;
+}
+
+function unique(list){
+    var newList = [];
+    for (var i=0;i<list.length;i++){
+        if (!contains(newList, list[i]))
+            newList.push(list[i]);
+    }
+    return newList;
+}
+
+
 var SelectedNodes = function(selectors){
     
     if (typeof selectors === "undefined" || selectors.trim() == "")
@@ -16,7 +35,7 @@ var SelectedNodes = function(selectors){
     var selectorArray = selectors.split(",");
     for (var i=0;i<selectorArray.length;i++){
         var selector = selectorArray[i];
-        var subSelectors = selector.split(/(?=[ #.])/);
+        var subSelectors = selector.trim().split(/(?=[ #.])/);
         for (var j=0;j<subSelectors.length;j++){
             var match = regex.exec(subSelectors[j].trim());
             if (match[0]){
@@ -40,6 +59,7 @@ var SelectedNodes = function(selectors){
         this.selectedNodes = this.selectedNodes.concat(this.nodes);
         this.nodes = allNodes;
     }
+    this.selectedNodes = unique(this.selectedNodes);
 }
 
 SelectedNodes.prototype = {

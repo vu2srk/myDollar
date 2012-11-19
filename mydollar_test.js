@@ -12,3 +12,15 @@ test("test sub-selector", function(){
     equal(nodes.selectedNodes.length, 1); 
     equal(nodes.selectedNodes[0].id, "innerP");
 });
+
+test("test multiple selectors", function(){
+    expect(1);
+    var nodes = my$(".something, .url");
+    equal(nodes.selectedNodes.length, 3);
+});
+
+test("test duplicate selectors", function(){
+    expect(1);
+    var nodes = my$(".something, #test_world p");
+    equal(nodes.selectedNodes.length, 3);
+});
