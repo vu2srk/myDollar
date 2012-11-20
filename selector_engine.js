@@ -1,4 +1,8 @@
 (function(window) {
+
+	var slice = Array.prototype.slice;
+	var push = Array.prototype.push;
+
 	function contains(list, item) {
 		for (var i = 0; i < list.length; i++) {
 			if (item === list[i])
@@ -26,16 +30,10 @@
 			if ( typeof selectors === "undefined" || selectors.trim() == "")
 				return;
 
-			//my$(".something div")
-
-			var slice = Array.prototype.slice;
-			var push = Array.prototype.push;
-
 			var selectedNodes = [];
 			var nodes = slice.call(document.getElementsByTagName("*"), 0);
 			var allNodes = nodes;
 			var selectedNodes = [];
-			var regex = /^(?:#([\w\-]+)|(\w+)|\.([\w\-]+))$/;
 
 			var selectorRegexes = [{
 				re : /^(?:(\w+))$/,
@@ -50,24 +48,8 @@
 
 			var selectorArray = selectors.split(",");
 			for (var i = 0; i < selectorArray.length; i++) {
-				var selector = selectorArray[i];
-				var subSelectors = selector.trim().split(/(?=[ #.])/);
-				for (var j = 0; j < subSelectors.length; j++) {
-					for (var k = 0; k < selectorRegexes.length; k++) {
-						var match = selectorRegexes[k].re.exec(subSelectors[j].trim());
-						if (match)
-							nodes = selectorRegexes[k].fn(match[1], nodes);
-					}
-					if (j + 1 != subSelectors.length) {
-						var newNodes = [];
-						for (var d = 0; d < nodes.length; d++) {
-							var node = nodes[d];
-							newNodes = newNodes.concat(slice.call(node.getElementsByTagName("*"), 0));
-						}
-						nodes = newNodes;
-					}
-				}
-				selectedNodes = selectedNodes.concat(nodes);
+				var eachSelectors = selectorArray[i].trim().split(/(?=[ #.])/);
+				selectedNodes = selectedNodes.concat(processSelector(eachSelectors, nodes, selectorRegexes, []));
 				nodes = allNodes;
 			}
 			selectedNodes = unique(selectedNodes);
@@ -92,6 +74,26 @@
 	}
 
 	my$.fn.init.prototype = my$.prototype;
+
+	function processSelector(selectors, nodes, selectorRegexes, selectedNodes) {
+		if (selectors.length == 0)
+			return selectedNodes;
+		else {
+			var newNodes = [];
+			for (var k = 0; k < selectorRegexes.length; k++) {
+				var match = selectorRegexes[k].re.exec(selectors[0].trim());
+				if (match) {
+					nodes = selectorRegexes[k].fn(match[1], nodes);
+					for (var n = 0; n < nodes.length; n++) {
+						var node = nodes[n];
+						newNodes = newNodes.concat(slice.call(node.getElementsByTagName("*"), 0));
+					}
+				}
+			}
+			selectors.splice(0, 1);
+			return processSelector(selectors, newNodes, selectorRegexes, nodes);
+		}
+	}
 
 	function throwError(msg) {
 		throw new Error(msg);
@@ -138,6 +140,7 @@
 		}
 		return newList;
 	}
+
 
 	window.my$ = my$;
 
